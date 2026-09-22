@@ -1,27 +1,24 @@
-# Verification — v0.1.0
+# Verification — v0.2.0 testing revision
 
 ## Automated
 
-`npm test`: 12 passing tests. Jump arc and edge-trigger behaviour, obstacle jump, duck collision, gap death and checkpoint score restoration, turtle warning/submersion, bird carry/release, required cliff distance, pause/practice state, rescue transition, deterministic replay, and complete nine-chapter runs in Modern and Classic modes.
+`npm test` exercises the original program through its CPU/input/render/audio host:
 
-The full-course controller in `scripts/playthrough.mjs` uses legal controls only: jump, duck and speed adjustment. It starts from a fresh unassisted game and reaches the rescue with tires remaining, including recovery from failed turtle crossings. No invulnerability or state positioning is used in those full-course runs. Focused unit fixtures do position the rider to isolate individual mechanics.
+- Animation and scrolling advance from the normal single-player checkpoint.
+- Jump and duck enter the original, distinct pose states and change the rendered frame.
+- Fire + right changes the native speed state.
+- SID register/envelope output produces finite, non-silent samples with a peak below clipping.
+- Pause freezes frame advancement and releases joystick input.
+- An unattended game loses its tires, reaches game over and restarts with the native entry speed and riding pose.
 
-`npm run build`: production build passes. Runtime is bundled locally. npm audit reported zero vulnerabilities at installation.
+`npm run build` creates a fully local HTML5 bundle.
 
-## Browser inspection
+## Browser checks
 
-Inspected the title/start flow and gameplay rendering in the Codex in-app Chromium browser. Checked the practice picker and final cave, and a 390 × 844 phone viewport. Fixed a canvas inline-size bug discovered by that phone test. Touch controls now appear directly beneath the game toolbar, and stay available during fullscreen on coarse-pointer devices. No JavaScript errors or warnings were reported in the inspected browser log.
+Local desktop browser: original game field and HUD render; start, keyboard jump input, pause, restart, sound controls and smoothing toggle exercised; no browser errors or warnings observed. Both raw-pixel and smoothed output inspected. A late character-bank switch in the runtime produced a garbled score-heading row; the host now renders the original four HUD rows directly from screen RAM and the original font. Sound defaults to muted.
 
-## Hosted release checks
+## Limits
 
-GitHub Actions tests/build/deployment succeeded. The GitHub Pages site returned HTTP 200. The final HTML5 ZIP was uploaded to itch.io, and its actual iframe was tested for successful title rendering, game start and pause. The listing includes three screenshots, a cover, free/no-payments pricing, and disclosure of AI-assisted graphics, sound, text and code. The saved description was reloaded and checked after correcting an initial editor synchronization issue.
+Original program execution is a substantial change from the first prototype. This revision has not yet been played through every crossing and the final rescue. Original gameplay routines are used, but the Viciious runtime and the small IRQ shim are not claimed to be cycle-exact hardware. SID waveform synthesis follows original register/envelope commands, without a full analogue filter model. Physical phone and gamepad testing is pending. Smoothing affects pixel contours, not the original animation cadence.
 
-The fixed-width inline itch.io embed cropped at a simulated narrow viewport, so the published listing uses click-to-launch fullscreen. The fullscreen frame exposed the responsive layout and touch controls. Physical mobile fullscreen behaviour remains untested. Both public pages returned HTTP 200 without authentication.
-
-## Remaining limits
-
-- Full-course completion is verified at simulation level, not by a manual unassisted browser playthrough.
-- A physical gamepad and phone have not been tested.
-- Synthesized sound is implemented and unlocked by user interaction; perceptual sound quality has not been independently audited by ear.
-- Reference frames were sampled; C64 frame-by-frame physics/timing equivalence is not claimed.
-- Browser checks do not constitute broad cross-browser compatibility certification.
+The previous custom-simulation full-course test does not validate this revision and has been removed. Owner playtesting is required before publication. Itch.io remains Draft; this revision is kept off main/GitHub Pages pending review.

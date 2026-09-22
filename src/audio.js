@@ -1,79 +1,33 @@
-export class AudioEngine {
-  constructor() {
-    this.enabled = true;
-    this.effects = 0.55;
-    this.music = 0.16;
-    this.ambience = 0.2;
-    this.beat = 0;
-    this.next = 0;
-  }
-  async unlock() {
-    if (!this.ctx) {
-      this.ctx = new AudioContext();
-      this.master = this.ctx.createGain();
-      this.master.gain.value = 0.65;
-      this.master.connect(this.ctx.destination);
-    }
-    if (this.ctx.state === "suspended") await this.ctx.resume();
-  }
-  tone(freq, end, duration, volume = 0.2, type = "sine", delay = 0) {
-    if (!this.ctx || !this.enabled) return;
-    const t = this.ctx.currentTime + delay,
-      o = this.ctx.createOscillator(),
-      g = this.ctx.createGain();
-    o.type = type;
-    o.frequency.setValueAtTime(freq, t);
-    o.frequency.exponentialRampToValueAtTime(Math.max(20, end), t + duration);
-    g.gain.setValueAtTime(0.001, t);
-    g.gain.exponentialRampToValueAtTime(Math.max(0.001, volume), t + 0.012);
-    g.gain.exponentialRampToValueAtTime(0.001, t + duration);
-    o.connect(g);
-    g.connect(this.master);
-    o.start(t);
-    o.stop(t + duration + 0.02);
-    o.onended = () => {
-      o.disconnect();
-      g.disconnect();
-    };
-  }
-  effect(name) {
-    const v = this.effects;
-    if (name === "jump") this.tone(170, 650, 0.16, v * 0.27, "triangle");
-    if (name === "land") this.tone(95, 42, 0.1, v * 0.15);
-    if (name === "crash") {
-      this.tone(160, 32, 0.35, v * 0.5, "triangle");
-      this.tone(650, 130, 0.22, v * 0.2, "sawtooth");
-    }
-    if (name === "splash")
-      for (let i = 0; i < 5; i++)
-        this.tone(230 + i * 63, 50, 0.22, v * 0.2, "sine", i * 0.06);
-    if (name === "bird") {
-      this.tone(850, 380, 0.12, v * 0.2);
-      this.tone(1000, 440, 0.2, v * 0.2, "sine", 0.16);
-    }
-    if (name === "clear" || name === "win")
-      [262, 330, 392, 524].forEach((f, i) =>
-        this.tone(f, f, 0.25, v * 0.25, "triangle", i * 0.12),
-      );
-  }
-  update(time, playing, speed) {
-    if (!this.ctx) return;
-    this.master.gain.setTargetAtTime(
-      playing && this.enabled ? 0.65 : 0,
-      this.ctx.currentTime,
-      0.04,
-    );
-    if (!playing) return;
-    if (time > this.next) {
-      this.next = time + 0.27;
-      const notes = [
-        262, 0, 330, 392, 0, 330, 294, 0, 220, 0, 294, 349, 0, 294, 262, 0,
-      ];
-      const f = notes[this.beat++ % notes.length];
-      if (f) this.tone(f, f * 0.997, 0.19, this.music * 0.18, "triangle");
-      this.tone(this.beat % 4 === 0 ? 95 : 160, 45, 0.07, this.music * 0.18);
-      if (this.beat % 2 === 0)
-        this.tone(70 + speed, 40, 0.035, this.ambience * 0.1, "triangle");
-    }
-  }
+// Sample the original SID register/envelope stream during CPU execution.
+// This preserves short effects, pulse width, pitch-dependent noise and sweeps.
+export class SidOutput {
+ constructor(){this.regs=new Uint8Array(32);this.volumes=[0,0,0];this.phase=[0,0,0];this.noisePhase=[0,0,0];this.noise=[0x7ffff8,0x5ffff8,0x3ffff8];this.clock=0;this.samples=[];this.dc=0;}
+ tick(){this.clock+=44100;if(this.clock<982800)return;this.clock-=982800;this.samples.push(this.sample());}
+ sample(){let mixed=0;for(let i=0;i<3;i++){
+  const r=i*7,c=this.regs[r+4],freq=(this.regs[r]+256*this.regs[r+1])*985248/16777216;
+  if(c&8){this.phase[i]=0;this.noise[i]=0x7ffff8;continue;}
+  this.phase[i]=(this.phase[i]+freq/44100)%1;const p=this.phase[i];
+  this.noisePhase[i]+=freq*16/44100;
+  while(this.noisePhase[i]>=1){this.noisePhase[i]--;const s=this.noise[i];this.noise[i]=((s<<1)|(((s>>>22)^(s>>>17))&1))&0x7fffff;}
+  let value=0,count=0;
+  if(c&16){value+=1-4*Math.abs(p-.5);count++;}
+  if(c&32){value+=2*p-1;count++;}
+  if(c&64){const width=(this.regs[r+2]+256*(this.regs[r+3]&15))/4096;value+=p<width?1:-1;count++;}
+  if(c&128){const s=this.noise[i];const bits=(((s>>>22)&1)<<7)|(((s>>>20)&1)<<6)|(((s>>>16)&1)<<5)|(((s>>>13)&1)<<4)|(((s>>>11)&1)<<3)|(((s>>>7)&1)<<2)|(((s>>>4)&1)<<1)|((s>>>2)&1);value+=bits/127.5-1;count++;}
+  if(count&&!(i===2&&(this.regs[24]&128)))mixed+=value/count*Math.max(0,Math.min(1,this.volumes[i]));
+ }
+ const value=mixed*(this.regs[24]&15)/15*.26;this.dc+=.002*(value-this.dc);return value-this.dc;
+ }
+ take(){const block=Float32Array.from(this.samples);this.samples.length=0;return block;}
+}
+
+export class Sound {
+ constructor(){this.synth=new SidOutput();this.enabled=true;this.running=false;this.effectsVolume=.8;this.sources=new Set();this.nextTime=0;}
+ attach=(c)=>{c.audio={reset:()=>{this.synth=new SidOutput();},onRegWrite:(r,v)=>{this.synth.regs[r]=v;},setVoiceVolume:(i,v)=>{this.synth.volumes[i]=v;},tick:()=>this.synth.tick(),endFrame:()=>this.enqueue(this.synth.take())};};
+ async unlock(){if(!this.context){const C=window.AudioContext||window.webkitAudioContext;if(!C)return;const c=this.context=new C();this.master=c.createGain();this.master.gain.value=0;const filter=c.createBiquadFilter();filter.type='lowpass';filter.frequency.value=11000;filter.Q.value=.5;this.master.connect(filter);filter.connect(c.destination);}await this.context.resume();}
+ enqueue(samples){if(!this.context||!this.running||!this.enabled||!samples.length)return;const c=this.context;
+  if(this.nextTime<c.currentTime||this.nextTime>c.currentTime+.15)this.nextTime=c.currentTime+.025;
+  const buffer=c.createBuffer(1,samples.length,44100);buffer.getChannelData(0).set(samples);const source=c.createBufferSource();source.buffer=buffer;source.connect(this.master);source.start(this.nextTime);this.nextTime+=samples.length/44100;this.sources.add(source);source.onended=()=>{source.disconnect();this.sources.delete(source);};
+ }
+ update(){if(!this.context)return;const active=this.enabled&&this.running;this.master.gain.setTargetAtTime(active?this.effectsVolume:0,this.context.currentTime,.006);if(!active){for(const source of this.sources){try{source.stop();}catch{}}this.sources.clear();this.nextTime=0;}}
 }

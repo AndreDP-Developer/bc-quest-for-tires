@@ -1,133 +1,55 @@
-import test from "node:test";
-import assert from "node:assert/strict";
-import { Game, STEP, JUMP, GRAVITY } from "../src/game.js";
-import { STAGES, turtleState, allGaps, birdPosition } from "../src/course.js";
-import { playthrough } from "../scripts/playthrough.mjs";
-function run(g, n, input = {}) {
-  for (let i = 0; i < n; i++)
-    g.tick(STEP, typeof input === "function" ? input(g) : input);
-}
-test("jump arc returns to ground and held jump cannot auto-repeat", () => {
-  const g = new Game();
-  g.start();
-  run(g, 100, { jump: true });
-  assert.equal(g.grounded, true);
-  assert.equal(g.y, 0);
-  assert.equal(g.events.filter((e) => e === "jump").length, 1);
-});
-test("jump clears a rock while riding into it costs a tire", () => {
-  const a = new Game();
-  a.start();
-  run(a, 400);
-  assert.equal(a.lives, 4);
-  const b = new Game();
-  b.start();
-  run(b, 380, (g) => ({ jump: g.x > 806 && g.x < 860 }));
-  assert.equal(b.lives, 5);
-  assert.ok(b.score > 0);
-});
-test("duck clears a branch and standing collides", () => {
-  const g = new Game();
-  g.enter(1);
-  g.start();
-  g.x = 1060;
-  run(g, 75, { duck: true });
-  assert.equal(g.lives, 5);
-  const h = new Game();
-  h.enter(1);
-  h.start();
-  h.x = 1060;
-  run(h, 75);
-  assert.equal(h.lives, 4);
-});
-test("holes cause falls and stage checkpoints restore score without farming", () => {
-  const g = new Game();
-  g.start();
-  g.x = 1900;
-  g.score = 30;
-  run(g, 100);
-  assert.equal(g.lives, 4);
-  run(g, 200);
-  assert.equal(g.stage, 0);
-  assert.equal(g.score, 0);
-  assert.ok(g.x < 900);
-});
-test("turtles warn before submerging; a submerged shell cannot support Thor", () => {
-  assert.equal(turtleState(4.2, 0), "warning");
-  assert.equal(turtleState(4.8, 0), "down");
-  const g = new Game();
-  g.enter(2);
-  g.start();
-  g.x = 730;
-  g.time = 4.7;
-  g.speed = 10;
-  run(g, 26);
-  assert.ok(g.y < 0);
-});
-test("Dooky Bird catches a jump and releases beyond the lava", () => {
-  const g = new Game();
-  g.enter(4);
-  g.start();
-  g.x = birdPosition(g).x;
-  g.y = 85;
-  g.vy = 300;
-  g.grounded = false;
-  run(g, 2);
-  assert.equal(g.carry, true);
-  run(g, 450);
-  assert.equal(g.carry, false);
-  assert.equal(g.lives, 5);
-  assert.ok(g.x > 1830);
-});
-test("cliff requires more travel than a normal-speed jump supplies", () => {
-  const duration = (2 * JUMP) / GRAVITY;
-  assert.ok(duration * 42 * 6 < 295);
-  assert.ok(duration * 80 * 6 > 295);
-});
-test("pause freezes simulation and practice is visibly assisted", () => {
-  const g = new Game();
-  g.start();
-  run(g, 50);
-  g.status = "paused";
-  const before = g.snapshot();
-  run(g, 100, { jump: true });
-  assert.deepEqual(g.snapshot(), before);
-  g.practice(7);
-  assert.equal(g.stage, 7);
-  assert.equal(g.assisted, true);
-  assert.equal(g.status, "paused");
-});
-test("last stage completes the rescue and awards a spare tire", () => {
-  const g = new Game();
-  g.enter(8);
-  g.x = STAGES[8].length - 1;
-  g.start();
-  run(g, 1);
-  assert.equal(g.status, "won");
-  assert.equal(g.lives, 6);
-});
-test("repeated deterministic input produces identical state", () => {
-  const a = new Game(),
-    b = new Game();
-  a.start();
-  b.start();
-  const input = (g) => ({
-    jump: Math.floor(g.time * 2) % 3 === 0,
-    duck: Math.floor(g.time) % 5 === 0,
-    accel: Math.sin(g.time) > 0 ? 1 : -1,
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import { createHash } from 'node:crypto';
+import { Game } from '../src/game.js';
+import { SidOutput } from '../src/audio.js';
+const initial = fs.readFileSync(new URL('../public/data/start.json', import.meta.url), 'utf8');
+const character = fs.readFileSync(new URL('../public/data/characters.bin', import.meta.url));
+const hash = pixels => createHash('sha256').update(pixels).digest('hex');
+// Hardware modules are singleton devices: run all cases serially on one machine.
+test('original game, animation, input, SID audio and restart', async t => {
+  const synth = new SidOutput(); let peak = 0, sampleCount = 0;
+  const game = new Game(initial, { character, audio(c) { c.audio = {
+    reset() {}, onRegWrite(r, v) { synth.regs[r] = v; },
+    setVoiceVolume(i, v) { synth.volumes[i] = v; }, tick() { synth.tick(); },
+    endFrame() { for (const v of synth.take()) { assert.ok(Number.isFinite(v)); peak = Math.max(peak, Math.abs(v)); sampleCount++; } },
+  }; } });
+  const run = (n, input = {}) => { for (let i = 0; i < n; i++) game.step(input); };
+  let baseline;
+  await t.test('scrolling and pedalling advance from the original checkpoint', () => {
+    const ready = hash(game.pixels); game.start(); run(30); baseline = hash(game.pixels);
+    assert.notEqual(baseline, ready); assert.equal(game.frames, 30);
+    assert.equal(game.machine.ram.readRam(0x120e), 0, 'single-player mode');
   });
-  run(a, 6000, input);
-  run(b, 6000, input);
-  assert.deepEqual(a.snapshot(), b.snapshot());
-});
-for (const mode of ["modern", "classic"])
-  test(`complete nine-chapter adventure using only legal inputs (${mode})`, () => {
-    const result = playthrough(mode);
-    assert.equal(result.state.status, "won");
-    assert.equal(result.state.assisted, false);
-    assert.ok(result.state.lives > 0);
-    assert.equal(
-      result.report.filter((r) => r.stage && r.crash === undefined).length,
-      9,
-    );
+  await t.test('jump and duck invoke distinct original animation routines', () => {
+    game.reset(); game.start(); run(30, { jump: true }); const jump = hash(game.pixels); assert.equal(game.machine.ram.readRam(0x4039), 1);
+    game.reset(); game.start(); run(30, { duck: true }); const duck = hash(game.pixels); assert.equal(game.machine.ram.readRam(0x4039), 2);
+    assert.notEqual(jump, baseline); assert.notEqual(duck, baseline); assert.notEqual(jump, duck);
   });
+  await t.test('speed modifier changes scrolling without replacing game physics', () => {
+    game.reset(); game.start(); run(90); const normal = hash(game.pixels), speed = game.machine.ram.readRam(0x4024);
+    game.reset(); game.start(); run(90, { right: true, speed: true });
+    assert.notEqual(hash(game.pixels), normal);
+    assert.ok(game.machine.ram.readRam(0x4024) < speed);
+  });
+  await t.test('original SID writes produce finite, non-silent audio', () => {
+    assert.ok(sampleCount > 100000); assert.ok(peak > .01); assert.ok(peak < 1);
+  });
+  await t.test('pausing freezes the machine and clears held input', () => {
+    game.pause(); const before = hash(game.pixels), frames = game.frames; run(30, { jump: true });
+    assert.equal(game.frames, frames); assert.equal(hash(game.pixels), before);
+    const cia = JSON.parse(game.machine.cias.serialize()); assert.equal(cia.joystick2, 255);
+  });
+  await t.test('five lost tires reach game over and Enter can start a fresh game', () => {
+    game.reset(); game.start(); run(100, { right: true, speed: true }); run(4000);
+    assert.equal(game.state, 'over');
+    assert.equal(game.machine.ram.readRam(0x120f), 0);
+    game.start(); assert.equal(game.state, 'playing'); assert.equal(game.frames, 0);
+    assert.equal(game.machine.ram.readRam(0x120f), 1);
+    const fresh = hash(game.pixels); run(30);
+    assert.notEqual(hash(game.pixels), fresh);
+    assert.equal(game.machine.ram.readRam(0x4039), 0);
+    assert.equal(game.machine.ram.readRam(0x4024), 39);
+  });
+});

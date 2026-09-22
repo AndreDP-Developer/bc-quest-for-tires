@@ -71,3 +71,7 @@ Create new comic effects: rolling stone chatter, springy jumps, duck swishes, ho
 ## Current state
 
 Nine chapters, original vector illustrations, Three.js presentation, synthesized audio, keyboard/touch/gamepad input and practice tools are implemented. Twelve tests pass, including complete simulation-level adventures in both play styles. Desktop and phone viewport checks have been performed. The implementation uses new course spacing and physics rather than recovered C64 routines; exact timings, physical slopes, alternating two-player support and full manual playthrough remain outside this first release. See docs/REFERENCE.md for observed reference frames and docs/VERIFICATION.md for testing limits.
+
+## Direction correction — 22 September 2026
+
+The owner rejected the first prototype's illustration style, static-looking animation and replacement music. The approved direction is now original C64 characters/animations and sound, with at most gentle smoothing. Revision v0.2.0 executes the original game through the C64 runtime used for Bruce Lee, renders its native frame in Three.js, and offers optional pixel-contour smoothing. The previous invented artwork and custom course simulation are superseded. Itch.io must remain Draft until the owner tests and explicitly approves publication.

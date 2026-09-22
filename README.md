@@ -1,61 +1,47 @@
-# B.C.'s Quest for Tires · A Stone Age Adventure
+# B.C.'s Quest for Tires
 
-A Three.js comic fan remake of the C64 classic. Thor has one stone wheel, five spare tires and a sweetheart to rescue. Ride through nine short chapters of rocks, low branches, unreliable turtles, lava, a helpful bird, a cliff jump, volcanic boulders and a dinosaur cave.
+A faithful C64 presentation in Three.js. This revision replaces the first prototype's invented artwork, course simulation and background tune with the original game program, sprites, scenery, animations and sound commands.
 
-**[Play on GitHub Pages](https://andredp-developer.github.io/bc-quest-for-tires/)**
+**Testing build — itch.io must remain Draft until the owner approves publication after testing.** The public main branch still contains the previous prototype; this revision is on `codex/original-c64-presentation`.
 
-**[Play on itch.io](https://fabrulana.itch.io/bc-quest-for-tires)**
-
-The artwork is newly drawn with outlined vector paths and layered scenery. Three.js renders the illustrations as textured planes in an orthographic scene. Music, comic effects and rolling ambience are synthesized locally through Web Audio. There are no CDN or remote asset dependencies.
-
-## Play
-
-| Control | Action |
-| --- | --- |
-| Enter | Start / resume |
-| Left / Right or A / D | Change position within the screen |
-| Up / W / Space | Jump |
-| Down / S | Duck |
-| Shift + Left / Right | Adjust travel speed |
-| P / Escape | Pause / resume |
-| M | Sound on/off |
-| F | Fullscreen |
-| F2 | Practice chapters |
-
-Touch buttons support movement, speed, duck and jump. Standard gamepads use the left stick or D-pad, A to jump, B to duck, triggers to change speed and Start to pause. Physical phone and controller testing has not been performed.
-
-Gold turtle shells warn of a dive. Jump beneath Dooky Bird before the lava to catch a lift. Reach speed 75+ for the long cliff jump, then jump close to the edge. Duck at the far bank of the turtle crossings. Crashes cost one tire and restart the current chapter with its entry score. Rescue awards a spare tire and offers another, faster adventure.
-
-Modern mode adds a short jump input buffer. Classic mode uses direct inputs; both use this remake's new simulation. Settings include separate effects/music/ambience levels and reduced motion. Switching away pauses the game. Practice selection, invulnerability and slow motion mark a run assisted and disable personal-best saving.
-
-## Develop
-
-Node.js 22 or newer:
+## Play locally
 
 ```sh
 npm ci
 npm run dev
-npm test
-npm run build
-npm run preview
 ```
 
-Development: http://127.0.0.1:5175/ . Production output: `dist/`. Serve over HTTP, not `file://`. Relative asset URLs support GitHub Pages subdirectories and itch.io embeds.
+Open http://127.0.0.1:5175/ . Enter starts or resumes; Restart / F1 starts over. Losing all tires offers a fresh game.
 
-`src/game.js` is a deterministic 120 Hz simulation independent of rendering. `src/course.js` contains the nine chapters. `src/art.js` contains original drawing instructions, rasterized once into textures. `src/renderer.js` handles Three.js presentation; `src/audio.js` handles Web Audio; `src/main.js` connects input and UI.
+| Control | Action |
+| --- | --- |
+| Left / Right or A / D | Move Thor within the screen |
+| Up / W / Space | Jump |
+| Down / S | Duck |
+| Shift + Left / Right | Change scrolling speed |
+| P / Escape | Pause / resume |
+| M | Toggle sound |
+| F | Fullscreen |
 
-The practice API is `window.bcQuest`: `snapshot()`, `selectStage(index)`, `pause()`, `resume()` and `step(count, input)`. Stage indices are zero-based. Stage selection and stepping mark the run assisted.
+Touch controls appear on coarse-pointer devices. Standard gamepad: left stick or D-pad to move, A to jump, B to duck, shoulder button plus left/right to change speed, Start to pause. Physical controller and phone testing is pending.
 
-## Fidelity and limits
+Gentle pixel smoothing uses a Scale2x-style contour filter. Switch it off for raw pixels. It does not change poses, frame timing, collisions or gameplay. The original animation runs at 50 updates per second. Sound starts muted and can be enabled with Sound on. Sound follows the original SID register/envelope stream; there is no replacement music or ambience loop.
 
-This is a new interpretation with measured visual references and newly designed obstacle spacing, not an emulator or a port of recovered C64 routines. No C64 executable, system ROM, original sprites or recorded soundtrack is bundled. The reference video was inspected at selected timestamps for visual structure, not exhaustively measured frame by frame. The course is shorter, terrain is physically flat, and restart/scoring/turtle/bird behaviour is newly implemented. Original speed-dependent slope physics and alternating two-player mode are not implemented. Do not treat Classic mode as cycle-exact C64 behaviour.
+## Implementation
 
-See [reference notes](docs/REFERENCE.md) and [verification notes](docs/VERIFICATION.md). Automated tests include full adventures using legal input sequences in both modes. That is a simulation-level playability check, not a manual complete browser playthrough.
+- Original single-player C64 gameplay checkpoint, CPU/VIC/CIA/SID runtime adapted from the Bruce Lee project.
+- Three.js renders the native 320 × 200 frame at a 4:3 display aspect ratio.
+- Minimal IRQ/keyboard compatibility shim replaces BASIC/KERNAL; the C64 character font is included for the original HUD.
+- Local assets only; no CDN or remote runtime dependency.
+- Web Audio synthesis follows the game's original sound commands. This is not a claim of cycle-exact C64 hardware or analogue SID filter emulation.
 
-## Release
+The previous custom chapter selector and Modern/Classic physics modes have been removed with the custom simulation. This version starts the original single-player game instead.
 
-GitHub Actions tests, builds and deploys `main` to Pages. The HTML5 ZIP must contain the **contents** of `dist/`, with `index.html` at the ZIP root. See [itch.io listing text](docs/ITCH_LISTING.md).
+## Validate and build
 
-## Credits
+```sh
+npm test
+npm run build
+```
 
-Original B.C. comic and characters: Johnny Hart and their respective rights holders. Original game: Sydney Development / Sierra On-Line. Three.js: the Three.js authors, MIT license. This is an unofficial fan project with no affiliation or endorsement. See [THIRD_PARTY.md](THIRD_PARTY.md).
+See [verification](docs/VERIFICATION.md) and [credits](THIRD_PARTY.md). `dist/` is the browser build. Zip its contents with `index.html` at the archive root for a future itch.io upload; do not publish without approval.
