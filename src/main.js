@@ -141,6 +141,7 @@ $("resumeBtn").onclick = () => {
   } else if (game.status === "gameover") start();
   else pause();
 };
+$("practiceResume").onclick = pause;
 $("settingsBtn").onclick = () => openDialog("settingsDialog");
 $("practiceBtn").onclick = () => openDialog("practiceDialog");
 $("aboutBtn").onclick = () => openDialog("aboutDialog");
@@ -319,7 +320,9 @@ function updateUI() {
   $("chapterNumber").textContent =
     `CHAPTER ${String(game.stage + 1).padStart(2, "0")} / 09`;
   $("chapterName").textContent = s.name;
-  const overlay = ["paused", "gameover", "won"].includes(game.status);
+  const practicePaused = game.status === "paused" && game.assisted;
+  $("practiceResume").hidden = !practicePaused || !!document.querySelector("dialog[open]");
+  const overlay = ["paused", "gameover", "won"].includes(game.status) && !practicePaused;
   $("overlay").hidden = !overlay || !!document.querySelector("dialog[open]");
   if (overlay) {
     const won = game.status === "won",

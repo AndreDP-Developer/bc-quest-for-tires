@@ -7,6 +7,7 @@
   --paper: #fff6da;
   --accent: #edbc4c;
 }
+.practice-resume{position:absolute;left:50%;bottom:80px;transform:translateX(-50%);z-index:6;font-size:10px;padding:12px 20px}.practice-resume:hover{transform:translateX(-50%) translateY(-2px)}
 * {
   box-sizing: border-box;
 }
