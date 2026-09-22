@@ -4,6 +4,8 @@ A Three.js comic fan remake of the C64 classic. Thor has one stone wheel, five s
 
 **[Play on GitHub Pages](https://andredp-developer.github.io/bc-quest-for-tires/)**
 
+**[Play on itch.io](https://fabrulana.itch.io/bc-quest-for-tires)**
+
 The artwork is newly drawn with outlined vector paths and layered scenery. Three.js renders the illustrations as textured planes in an orthographic scene. Music, comic effects and rolling ambience are synthesized locally through Web Audio. There are no CDN or remote asset dependencies.
 
 ## Play

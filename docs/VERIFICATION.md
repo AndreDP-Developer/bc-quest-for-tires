@@ -14,6 +14,12 @@ Inspected the title/start flow and gameplay rendering in the Codex in-app Chromi
 
 ## Limits
 
+## Hosted release checks
+
+GitHub Actions tests/build/deployment succeeded. The GitHub Pages site returned HTTP 200. The final HTML5 ZIP was uploaded to itch.io, and its actual iframe was tested for successful title rendering, game start and pause. The listing includes three screenshots, a cover, free/no-payments pricing, and disclosure of AI-assisted graphics, sound, text and code. The saved description was reloaded and checked after correcting an initial editor synchronization issue.
+
+## Remaining limits
+
 - Full-course completion is verified at simulation level, not by a manual unassisted browser playthrough.
 - A physical gamepad and phone have not been tested.
 - Synthesized sound is implemented and unlocked by user interaction; perceptual sound quality has not been independently audited by ear.
