@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#233e35" />
+    <meta
+      name="description"
+      content="A prehistoric comic adventure. Ride, jump and duck through a Three.js fan remake of B.C.'s Quest for Tires."
+    />
+    <title>B.C.'s Quest for Tires · A Stone Age Adventure</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <main id="app">
+      <header class="masthead">
+        <a class="brand" href="./" aria-label="B.C. Quest for Tires home"
+          ><span class="wheel-mark">◉</span
+          ><span>STONE AGE<br /><b>ARCADE CLUB</b></span></a
+        >
+        <div class="edition">
+          THE CLASSICS, REIMAGINED <span>•</span> NO. 003
+        </div>
+        <button id="aboutBtn" class="quiet">
+          About this adventure <span>↗</span>
+        </button>
+      </header>
+      <section
+        class="game-shell"
+        id="shell"
+        aria-label="B.C.'s Quest for Tires game"
+      >
+        <div
+          id="scene"
+          aria-label="Game scene: Thor rides a stone unicycle through prehistoric countryside"
+        ></div>
+        <div class="paper-grain" aria-hidden="true"></div>
+        <div id="titleScreen" class="title-screen">
+          <div class="eyebrow"><span></span> A STONE AGE ADVENTURE</div>
+          <h1>
+            <span class="bc">B.C.’s</span><span>QUEST FOR</span
+            ><strong>TIRES<span class="title-dot">.</span></strong>
+          </h1>
+          <p class="tagline">
+            One wheel. Big trouble.<br />A whole lot of prehistory.
+          </p>
+          <button class="primary start" id="startBtn">
+            LET’S ROLL <span>→</span>
+          </button>
+          <div class="start-note">
+            PRESS ENTER TO BEGIN <i>·</i> SOUND ON FOR THE GOOD STUFF
+          </div>
+        </div>
+        <div id="heroCaption" class="hero-caption">
+          THE WHEEL WAS A GOOD IDEA.<br />THE REST? WE’LL SEE.
+        </div>
+        <div class="issue-stamp" id="stamp">
+          EST.<br /><strong>10,000</strong><br />B.C. (ISH)
+        </div>
+        <div id="hud" class="hud" hidden>
+          <div class="hud-section">
+            <span id="stageTag">SUNSTONE PLAINS</span
+            ><b id="stageTitle">The rolling stones</b>
+          </div>
+          <div class="hud-stat"><span>SCORE</span><b id="score">00000</b></div>
+          <div class="hud-stat">
+            <span>TIRES</span><b id="lives">● ● ● ● ●</b>
+          </div>
+          <div class="hud-stat speed">
+            <span>SPEED</span><b id="speed">42</b>
+            <div><i id="speedBar"></i></div>
+          </div>
+          <button id="pauseBtn" class="icon-btn" aria-label="Pause game">
+            Ⅱ
+          </button>
+        </div>
+        <div id="stageToast" class="stage-toast" hidden>
+          <span id="chapterNumber">CHAPTER 01</span>
+          <h2 id="chapterName">The rolling stones</h2>
+        </div>
+        <div id="hint" class="game-hint" hidden></div>
+        <div id="assisted" class="assisted" hidden>PRACTICE RUN · ASSISTED</div>
+        <div class="progress" id="progress" hidden>
+          <i id="progressFill"></i>
+        </div>
+        <div id="overlay" class="overlay" hidden>
+          <div
+            class="dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="overlayTitle"
+          >
+            <div class="eyebrow" id="overlayEyebrow">TAKE A BREATHER</div>
+            <h2 id="overlayTitle">Stone still.</h2>
+            <p id="overlayText">Even prehistoric legs need a rest.</p>
+            <button id="resumeBtn" class="primary">KEEP ROLLING →</button
+            ><button id="restartBtn" class="secondary">
+              Start a new adventure
+            </button>
+          </div>
+        </div>
+        <div id="failure" class="overlay" hidden>
+          <div class="dialog">
+            <h2>One small snag.</h2>
+            <p id="failureText"></p>
+          </div>
+        </div>
+      </section>
+      <nav class="game-toolbar" aria-label="Game options">
+        <div class="toolbar-left">
+          <span class="live-dot"></span
+          ><span id="runLabel">A COMIC CLASSIC, BACK ON ITS WHEEL</span>
+        </div>
+        <div class="toolbar-actions">
+          <button id="soundBtn" aria-label="Mute sound">
+            ♪ <span>SOUND ON</span></button
+          ><button id="settingsBtn">⚙ <span>SETTINGS</span></button
+          ><button id="practiceBtn">◇ <span>PRACTICE</span></button
+          ><button id="fullBtn">⛶ <span>FULLSCREEN</span></button>
+        </div>
+      </nav>
+      <section class="under-game">
+        <div class="intro-copy">
+          <span class="eyebrow">SAVE THE DAY. TRY NOT TO BONK.</span>
+          <h2>Love is a bumpy ride.</h2>
+          <p>
+            Help Thor rescue his sweetheart from a hungry dinosaur. Hop the
+            rocks, duck the branches, and put your trust in some deeply
+            unreliable turtles.
+          </p>
+        </div>
+        <div class="controls">
+          <div><kbd>←</kbd><kbd>→</kbd><span>Move</span></div>
+          <div><kbd>SPACE</kbd><span>Jump</span></div>
+          <div><kbd>↓</kbd><span>Duck</span></div>
+          <div><kbd>SHIFT</kbd><kbd>← →</kbd><span>Speed</span></div>
+        </div>
+      </section>
+      <div class="touch-controls" aria-label="Touch game controls">
+        <button data-hold="left" aria-label="Move left">←</button
+        ><button data-hold="right" aria-label="Move right">→</button
+        ><button data-hold="slower" aria-label="Slow down">−</button
+        ><button data-hold="faster" aria-label="Speed up">+</button
+        ><button data-hold="duck">DUCK</button
+        ><button data-hold="jump" class="touch-jump">JUMP ↑</button>
+      </div>
+      <footer>
+        <span>AN UNOFFICIAL FAN REMAKE · INSPIRED BY JOHNNY HART’S B.C.</span
+        ><span>THREE.JS <i>×</i> A LITTLE PREHISTORIC MAGIC</span>
+      </footer>
+    </main>
+    <dialog id="settingsDialog">
+      <form method="dialog">
+        <button class="close" aria-label="Close settings">×</button>
+      </form>
+      <div class="eyebrow">MAKE YOURSELF AT CAVE</div>
+      <h2>The little things.</h2>
+      <label class="setting"
+        >Play style<select id="mode">
+          <option value="modern">Modern · buffered jumps</option>
+          <option value="classic">Classic · direct inputs</option>
+        </select></label
+      >
+      <p class="small">
+        Both use this remake’s physics. Changing style starts a new adventure.
+      </p>
+      <label class="setting"
+        >Sound effects<input
+          id="effects"
+          type="range"
+          min="0"
+          max="100"
+          value="55" /></label
+      ><label class="setting"
+        >Music<input
+          id="music"
+          type="range"
+          min="0"
+          max="100"
+          value="16" /></label
+      ><label class="setting"
+        >Rolling ambience<input
+          id="ambience"
+          type="range"
+          min="0"
+          max="100"
+          value="20" /></label
+      ><label class="setting"
+        >Reduced motion<input id="reduced" type="checkbox"
+      /></label>
+      <p class="small">
+        P / Esc: pause · M: sound · F: fullscreen<br />Gamepad: stick to move, A
+        jump, B duck, triggers change speed.
+      </p>
+    </dialog>
+    <dialog id="practiceDialog">
+      <form method="dialog">
+        <button class="close" aria-label="Close practice">×</button>
+      </form>
+      <div class="eyebrow">A FEW PRACTICE WHEELS</div>
+      <h2>Pick your predicament.</h2>
+      <div id="chapterList" class="chapter-list"></div>
+      <label class="setting"
+        >Show rider collision box<input type="checkbox" id="hitboxes" /></label
+      ><label class="setting"
+        >Invulnerability <input type="checkbox" id="invulnerable" /></label
+      ><label class="setting"
+        >Simulation speed<select id="timeScale">
+          <option value="1">Normal</option>
+          <option value="0.5">Half speed</option>
+          <option value="0.25">Quarter speed</option>
+        </select></label
+      >
+      <p class="small">Practice and assists do not save a personal best.</p>
+    </dialog>
+    <dialog id="aboutDialog">
+      <form method="dialog">
+        <button class="close" aria-label="Close about">×</button>
+      </form>
+      <div class="eyebrow">THE CLASSICS, REIMAGINED · NO. 003</div>
+      <h2>A wheel worth reinventing.</h2>
+      <p>
+        A new comic interpretation of <em>B.C.’s Quest for Tires</em>, with
+        original illustrations, synthesized sound and a Three.js stage.
+      </p>
+      <p>
+        Based on the C64 adventure developed by Sydney Development and published
+        by Sierra On-Line. B.C. and its characters were created by Johnny Hart
+        and belong to their respective rights holders. This is an unofficial fan
+        project.
+      </p>
+      <p class="small">
+        This version recreates the encounters with new physics and course
+        layouts. It does not run the original C64 program. Art and sound were
+        created for this remake.
+      </p>
+      <a
+        href="https://www.youtube.com/watch?v=xu2c6-Oa6dY"
+        target="_blank"
+        rel="noreferrer"
+        >Watch the original game reference ↗</a
+      >
+    </dialog>
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
