@@ -198,11 +198,11 @@ function onNewLine() {
   state.badline = lineOfChar === 7;
 
   if (state.twentyFiveRows) {
-    if      (state.lineOfRaster === BORDER_OFF_LINE_25_ROWS) state.dflag = false;
+    if      (state.lineOfRaster === BORDER_OFF_LINE_25_ROWS && state.displayEnable) state.dflag = false;
     else if (state.lineOfRaster ===  BORDER_ON_LINE_25_ROWS) state.dflag = true;
   }
   else {
-    if      (state.lineOfRaster === BORDER_OFF_LINE_24_ROWS) state.dflag = false;
+    if      (state.lineOfRaster === BORDER_OFF_LINE_24_ROWS && state.displayEnable) state.dflag = false;
     else if (state.lineOfRaster ===  BORDER_ON_LINE_24_ROWS) state.dflag = true;
   }
 
@@ -571,8 +571,8 @@ function get8Pixels(xc, y) {
     : systemPalette
   );
 
-  // Display off?
-  if (!state.displayEnable) return new Array(8).fill(defaultPalette[state.borderColor]);
+  // DEN gates opening the vertical border; it is not an immediate pixel mute.
+  // Mid-frame DEN changes must not reveal only the lower half of a frame.
 
   // If we're on the top/bottom border, output the border color
   if (state.dflag) {

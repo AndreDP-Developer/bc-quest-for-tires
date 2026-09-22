@@ -41,6 +41,24 @@ test('original game, animation, input, SID audio and restart', async t => {
     assert.equal(game.frames, frames); assert.equal(hash(game.pixels), before);
     const cia = JSON.parse(game.machine.cias.serialize()); assert.equal(cia.joystick2, 255);
   });
+  await t.test('re-entry blanks the whole field and restores a complete scene', () => {
+    game.reset(); game.start(); let blankFrames = 0, returned = false;
+    for (let f = 0; f < 800; f++) {
+      game.step(); const entry = game.machine.ram.readRam(0x405e);
+      if (entry > 40 && entry < 160) {
+        for (const y of [20, 100, 150]) {
+          const p = (y * 320 + 20) * 4;
+          assert.deepEqual([...game.pixels.slice(p, p + 3)], [0, 0, 0], 'no partial scenery during the closed-border interval');
+        }
+        blankFrames++;
+      }
+      if (blankFrames && entry === 0) { run(2); returned = true; break; }
+    }
+    assert.ok(blankFrames > 10); assert.ok(returned);
+    assert.equal(game.machine.ram.readRam(0x4039), 0);
+    assert.ok(game.pixels[(20 * 320 + 20) * 4 + 2] > 50, 'sky restored');
+    assert.ok(game.pixels[(100 * 320 + 20) * 4] > 200, 'field restored');
+  });
   await t.test('five lost tires reach game over and Enter can start a fresh game', () => {
     game.reset(); game.start(); run(100, { right: true, speed: true }); run(4000);
     assert.equal(game.state, 'over');

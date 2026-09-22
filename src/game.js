@@ -5,15 +5,16 @@ export class Game {
     this.initial = initial;
     this.character = character;
     this.pixels = new Uint8Array(WIDTH * HEIGHT * 4);
+    this.backPixels = new Uint8Array(this.pixels.length);
     this.revision = 0;
     this.machine = createMachine({
       roms: { character }, audio,
       pixel: (x, y, r, g, b) => {
         if (x < 136 || x >= 456 || y < 51 || y >= 251) return;
         const i = ((y - 51) * WIDTH + x - 136) * 4;
-        this.pixels[i] = r; this.pixels[i + 1] = g; this.pixels[i + 2] = b; this.pixels[i + 3] = 255;
+        this.backPixels[i] = r; this.backPixels[i + 1] = g; this.backPixels[i + 2] = b; this.backPixels[i + 3] = 255;
       },
-      blit: () => this.revision++,
+      blit: () => { this.pixels.set(this.backPixels); this.revision++; },
     });
     this.reset();
   }
@@ -24,6 +25,8 @@ export class Game {
     this.machine.ram.writeRam(0xcb, 64);
     this.frames = 0;
     this.state = 'ready';
+    this.machine.audio.setCrash?.(false);
+    this.machine.frame();
     this.machine.frame();
     this.drawHud();
   }
@@ -35,6 +38,7 @@ export class Game {
     const bits = (input.jump ? 1 : 0) | (input.duck ? 2 : 0) |
       (input.left ? 4 : 0) | (input.right ? 8 : 0) | (input.speed ? 16 : 0);
     this.machine.joy(bits, 2);
+    this.machine.audio.setCrash?.(this.machine.ram.readRam(0x4039) >= 16 || this.machine.ram.readRam(0x405e) > 0);
     this.machine.frame();
     this.drawHud();
     this.frames++;
