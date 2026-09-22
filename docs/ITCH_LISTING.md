@@ -21,4 +21,4 @@ Original comic: Johnny Hart. Original game: Sydney Development / Sierra On-Line.
 
 ## Upload configuration
 
-Kind: HTML. Release status: In development. Pricing: No payments. Upload the ZIP as playable in browser. Embed: 1280 × 900, fullscreen allowed, mobile-friendly. Tags: retro, arcade, platformer, comic, remake, dinosaurs. Source link: https://github.com/AndreDP-Developer/bc-quest-for-tires .
+Kind: HTML. Release status: In development. Pricing: No payments. ZIP is playable in browser. Launch mode: click to launch in fullscreen, mobile-friendly, scrollbars enabled. Genre: Platformer. Published tag: retro. AI disclosure: graphics, sounds, text/dialog and code. Source link: https://github.com/AndreDP-Developer/bc-quest-for-tires .
