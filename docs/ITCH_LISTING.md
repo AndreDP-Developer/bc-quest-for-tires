@@ -1,6 +1,6 @@
 # Future itch.io listing — DRAFT ONLY
 
-**Do not publish until the owner explicitly approves after testing.** Existing itch.io project is Draft. No upload has been made for this revision.
+Owner approved publication after testing on 22 September 2026. Version 0.2.1 is uploaded and Public at https://fabrulana.itch.io/bc-quest-for-tires . Verified the browser build loads with Sound off. Cover, screenshot and description now match the original-C64 presentation.
 
 B.C.'s Quest for Tires with its original C64 characters, scenery, animation and sound, presented through Three.js. Optional gentle pixel smoothing preserves the original poses and timing. No replacement music.
 

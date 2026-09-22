@@ -11,3 +11,7 @@ No added music. No itch.io publication. Owner playtesting is required before pub
 - Fixed VIC display-enable handling: DEN gates opening the vertical border instead of instantly blanking individual pixel spans. Death/re-entry now clears and restores a whole field rather than showing a black sky over a visible lower scene.
 - Publish completed video frames through a back buffer to avoid showing half-updated poses.
 - Muted browser verification. Regression tests cover hard sync, crash noise attenuation, whole-field re-entry and restart. No itch.io publication.
+
+## Publication
+
+Owner approved v0.2.1 after testing on 22 September 2026. Uploaded the tested ZIP to itch.io, selected it as the browser build, updated description/cover/screenshot, set visibility Public, and verified it loads muted. https://fabrulana.itch.io/bc-quest-for-tires
