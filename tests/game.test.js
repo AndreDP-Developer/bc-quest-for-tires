@@ -59,7 +59,7 @@ test('original game, animation, input, SID audio and restart', async t => {
     assert.ok(game.pixels[(20 * 320 + 20) * 4 + 2] > 50, 'sky restored');
     assert.ok(game.pixels[(100 * 320 + 20) * 4] > 200, 'field restored');
   });
-  await t.test('woodland scroll changes do not flash a black dash across the clearing', () => {
+  await t.test('woodland scroll stays coherent without canopy shake or black flashes', () => {
     game.reset(); game.start();
     // Test-only bypass of the original obstacle collision routine lets the
     // unmodified scrolling program reach and traverse the woodland reliably.
@@ -67,10 +67,24 @@ test('original game, animation, input, SID audio and restart', async t => {
     game.machine.ram.writeRam(0x9861, 0x60);
     try {
       run(90, { right: true, speed: true }); run(660);
-      let first;
+      let first, previousCanopy;
       for (let f = 0; f < 1000; f++) {
         game.step();
         if (!f) first = hash(game.pixels);
+        const canopy = game.pixels.slice(62 * 320 * 4, 63 * 320 * 4);
+        if (previousCanopy) {
+          // Every interior canopy pixel must match a forward translation of
+          // the previous frame. Coarse/fine mismatch used to jump -4 then +9.
+          let best = Infinity;
+          for (let shift = 0; shift <= 8; shift++) {
+            let mismatches = 0;
+            for (let x = 25; x < 290; x++) for (let c = 0; c < 3; c++)
+              mismatches += canopy[x * 4 + c] !== previousCanopy[(x + shift) * 4 + c];
+            best = Math.min(best, mismatches);
+          }
+          assert.equal(best, 0, `canopy scrolls forward without tearing at frame ${f}`);
+        }
+        previousCanopy = canopy;
         for (let x = 8; x < 312; x++) {
           const p = (87 * 320 + x) * 4;
           assert.ok(game.pixels[p] + game.pixels[p + 1] + game.pixels[p + 2] > 0,

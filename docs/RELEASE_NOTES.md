@@ -29,3 +29,9 @@ Fixed the woodland flash: a mid-scanline fine-scroll change could exhaust the ei
 The regression bypasses obstacle collisions only in its isolated test run to reach the woodland. This bypass is not part of the game build.
 
 Published v0.2.3 to itch.io on 23 September 2026 and verified the public splash, sound-on default and version description. Production build and all 11 tests passed; browser verification was muted.
+
+## v0.2.4 - coherent scenery scrolling
+
+Fixed the woodland/cave character-copy race. The original program moves four character rows before committing the matching fine-scroll value. The approximate VIC host could display the new character rows with the old offset, producing backward jumps and torn foliage. A VIC-only read snapshot now retains those rows until the original program commits the scroll. CPU RAM, collision logic, input, speed and original timing remain unchanged.
+
+Expanded the 1,000-frame woodland regression to require an exact forward translation of the canopy on every frame, in addition to no black stripe. All 11 tests pass. See SCROLLING_QA.md for the assisted full-route coverage and limits.

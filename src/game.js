@@ -16,9 +16,22 @@ export class Game {
       },
       blit: () => { this.pixels.set(this.backPixels); this.revision++; },
     });
+    // The canopy scroll copies four character rows before publishing its new
+    // fine-scroll value. Our approximate VIC timing can fetch during that copy.
+    // Keep its previous character rows visible until the matching scroll commit;
+    // CPU RAM, collisions and the original program remain untouched.
+    this.machine.hooks.onRamWrite = address => {
+      if (address === 0x518 && this.machine.cpu.getState().pc === 0x76f2) {
+        this.canopyBeforeCopy = Uint8Array.from({ length: 160 }, (_, i) => this.machine.ram.readRam(0x518 + i));
+      }
+      if (address === 0x4002 || address === 0x401b) this.canopyBeforeCopy = null;
+    };
+    this.machine.hooks.onVicRead = address =>
+      address >= 0x518 && address < 0x5b8 ? this.canopyBeforeCopy?.[address - 0x518] : undefined;
     this.reset();
   }
   reset() {
+    this.canopyBeforeCopy = null;
     this.machine.runloop.deserialize(this.initial);
     this.clearInput();
     this.machine.ram.writeRam(0xc6, 0);

@@ -56,8 +56,9 @@ function readRam(addr) {
 }
 
 function vicReadRam(addr) {
-  if (c64.hooks.onVicRead) c64.hooks.onVicRead(addr);
-  return state[addr];
+  // Optional presentation override; CPU reads always see the real RAM.
+  const displayed = c64.hooks.onVicRead?.(addr);
+  return displayed ?? state[addr];
 }
 
 function writeRam(addr, byte) {
