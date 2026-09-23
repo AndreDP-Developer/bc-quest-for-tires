@@ -27,3 +27,5 @@ Replaced the first splash with a landscape illustration based on the original bo
 Fixed the woodland flash: a mid-scanline fine-scroll change could exhaust the eight-pixel background queue, producing undefined RGB values rendered black. Empty dots now use the background colour. No changes to original gameplay, collision code or timing. A 1,000-frame woodland regression and the existing audio, animation, re-entry and restart checks pass (11 tests).
 
 The regression bypasses obstacle collisions only in its isolated test run to reach the woodland. This bypass is not part of the game build.
+
+Published v0.2.3 to itch.io on 23 September 2026 and verified the public splash, sound-on default and version description. Production build and all 11 tests passed; browser verification was muted.
