@@ -1,11 +1,21 @@
-# Future itch.io listing — DRAFT ONLY
+# Published itch.io listing
 
-Owner approved publication after testing on 22 September 2026. Version 0.2.1 is uploaded and Public at https://fabrulana.itch.io/bc-quest-for-tires . Verified the browser build loads with Sound off. Cover, screenshot and description now match the original-C64 presentation.
+Public: https://fabrulana.itch.io/bc-quest-for-tires
 
-B.C.'s Quest for Tires with its original C64 characters, scenery, animation and sound, presented through Three.js. Optional gentle pixel smoothing preserves the original poses and timing. No replacement music.
+Version 0.2.4 includes the scrolling fixes, cover-inspired splash and expanded original-game credits. Sound is on by default and starts after the player clicks Let’s roll. The credits-only rebuild does not change gameplay or sound.
 
-Jump rocks, duck branches, cross the turtles and rescue Thor's sweetheart. Keyboard, touch and standard gamepad mappings; pause, restart, volume and fullscreen.
+## Credits
 
-Arrows / A-D position; Up / W / Space jump; Down / S duck; Shift + left/right change speed; Enter start/resume; P pause; F1 restart; M sound; F fullscreen.
+Johnny Hart — B.C. comic, characters and original Sierra cover artwork.
+Rick (Richard) Banks and Michael Bate — original game design.
+Charles “Chuck” Benton — Commodore 64 programming.
+Sydney Development — original developer.
+Sierra On-Line — original publisher, 1983.
 
-Unofficial fan project. B.C. and the original game belong to their respective owners. See THIRD_PARTY.md. This replaces v0.1.0's new artwork/course simulation; previous chapter-practice and modern-physics claims no longer apply.
+Browser presentation uses Three.js and the Viciious runtime by luxocrates. Original program reference: Krisztián Tóth’s C64 archive. Browser integration, interface, sound refinements, page text and the cover-inspired splash were made with AI assistance; gameplay, sprites and animation come from the original C64 game.
+
+This is an unofficial fan tribute, not affiliated with or endorsed by the original creators. Original material remains the property of its respective owners. The itch.io account hosts this tribute and is not the creator of the original game.
+
+The automatic itch.io account byline remains, as it does on Bruce Lee and China Miner. The owner accepted this platform limitation on 23 September 2026; no account rename was made.
+
+Source: https://github.com/AndreDP-Developer/bc-quest-for-tires/tree/codex/original-c64-presentation

@@ -45,3 +45,14 @@ npm run build
 ```
 
 See [verification](docs/VERIFICATION.md) and [credits](THIRD_PARTY.md). `dist/` is the browser build. Zip its contents with `index.html` at the archive root for a future itch.io upload; do not publish without approval.
+
+## Credits and sources
+
+- **Johnny Hart** — B.C. comic, characters and original Sierra cover artwork.
+- **Rick (Richard) Banks and Michael Bate** — original game design.
+- **Charles “Chuck” Benton** — Commodore 64 programming.
+- **Sydney Development** — original developer; **Sierra On-Line** — original publisher, 1983.
+- **luxocrates / Viciious** — hardware runtime; **Three.js authors** — browser rendering library.
+- **Krisztián Tóth’s C64 archive** — original program reference.
+
+Browser integration, interface, sound refinements, page text and the cover-inspired splash were made with AI assistance. Original gameplay, artwork, animation and sound remain credited to the original game. This unofficial fan tribute is not affiliated with or endorsed by the original creators. The hosting account is not the original game's author. See [third-party notices and credit sources](THIRD_PARTY.md).
