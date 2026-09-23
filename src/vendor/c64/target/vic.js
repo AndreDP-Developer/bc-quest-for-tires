@@ -480,7 +480,10 @@ function get8BackgroundPixels(xc, y, color, mask, collision) {
         loadBgQueues();
       }
 
-      color    [x] =         state.bgRgbQueue      [state.bgQueuePos];
+      // A mid-scanline fine-scroll change can exhaust the eight-dot queue
+      // before the next reload. Empty shift-register dots are background,
+      // not undefined RGB (which the host converted to flashing black).
+      color    [x] = state.bgRgbQueue[state.bgQueuePos] ?? systemPalette[state.backgroundColor];
       mask     [x] = Boolean(state.bgMaskQueue     [state.bgQueuePos]);
       collision[x] = Boolean(state.bgCollisionQueue[state.bgQueuePos]);
 

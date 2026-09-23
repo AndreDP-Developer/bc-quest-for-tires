@@ -59,6 +59,27 @@ test('original game, animation, input, SID audio and restart', async t => {
     assert.ok(game.pixels[(20 * 320 + 20) * 4 + 2] > 50, 'sky restored');
     assert.ok(game.pixels[(100 * 320 + 20) * 4] > 200, 'field restored');
   });
+  await t.test('woodland scroll changes do not flash a black dash across the clearing', () => {
+    game.reset(); game.start();
+    // Test-only bypass of the original obstacle collision routine lets the
+    // unmodified scrolling program reach and traverse the woodland reliably.
+    const collisionOpcode = game.machine.ram.readRam(0x9861);
+    game.machine.ram.writeRam(0x9861, 0x60);
+    try {
+      run(90, { right: true, speed: true }); run(660);
+      let first;
+      for (let f = 0; f < 1000; f++) {
+        game.step();
+        if (!f) first = hash(game.pixels);
+        for (let x = 8; x < 312; x++) {
+          const p = (87 * 320 + x) * 4;
+          assert.ok(game.pixels[p] + game.pixels[p + 1] + game.pixels[p + 2] > 0,
+            `no empty-buffer black pixel at woodland frame ${f}, x=${x}`);
+        }
+      }
+      assert.notEqual(hash(game.pixels), first, 'scenery continues scrolling');
+    } finally { game.machine.ram.writeRam(0x9861, collisionOpcode); }
+  });
   await t.test('five lost tires reach game over and Enter can start a fresh game', () => {
     game.reset(); game.start(); run(100, { right: true, speed: true }); run(4000);
     assert.equal(game.state, 'over');

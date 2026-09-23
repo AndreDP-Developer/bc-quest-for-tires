@@ -5,8 +5,10 @@ import { Sound } from './audio.js';
 const $ = id => document.getElementById(id), keys = new Set(), touch = new Set();
 const sound = new Sound();
 let game, view, accumulator = 0, last = 0, padWasPressed = false;
-let settings = { smooth: true, sound: false, volume: 75 };
+let settings = { smooth: true, sound: true, volume: 75 };
 try { settings = { ...settings, ...JSON.parse(localStorage.getItem('bc-original-settings') || '{}') }; } catch {}
+// Older releases saved an automatic mute; only retain an explicit new choice.
+if (!settings.audioPreference) settings.sound = true;
 function save() { try { localStorage.setItem('bc-original-settings', JSON.stringify(settings)); } catch {} }
 function apply() {
   sound.enabled = settings.sound; sound.effectsVolume = settings.volume / 100;
@@ -14,13 +16,16 @@ function apply() {
   $('volumeValue').value = `${settings.volume}%`;
   $('sound').textContent = settings.sound ? 'Sound on' : 'Sound off';
   $('sound').setAttribute('aria-pressed', String(settings.sound));
+  $('splashSound').textContent = settings.sound ? 'Sound on ♫' : 'Sound off';
+  $('splashSound').setAttribute('aria-pressed', String(settings.sound));
   view?.render(settings.smooth); sound.update(); save();
 }
 function clearInput() { keys.clear(); touch.clear(); game?.clearInput(); document.querySelectorAll('.pressed').forEach(el => el.classList.remove('pressed')); }
 function refresh() {
   if (!game) return;
   const playing = game.state === 'playing';
-  $('notice').hidden = playing;
+  $('splash').hidden = game.state !== 'ready';
+  $('notice').hidden = playing || game.state === 'ready';
   $('noticeText').textContent = game.state === 'over' ? 'Game over — one more ride?' : game.state === 'ready' ? 'The original Stone Age adventure.' : 'Paused — ready when you are.';
   $('play').innerHTML = game.state === 'over' ? 'Try again <span>→</span>' : game.state === 'ready' ? 'Let’s roll <span>→</span>' : 'Continue <span>→</span>';
   $('pause').textContent = playing ? 'Pause' : game.state === 'over' ? 'Try again' : game.state === 'ready' ? 'Play' : 'Continue';
@@ -32,8 +37,8 @@ function pause() { if (!game) return; game.pause(); clearInput(); refresh(); }
 function togglePause() { if (game?.state === 'playing') pause(); else play(); }
 function restart() { if (!game) return; pause(); game.reset(); view.render(settings.smooth); play(); }
 async function fullscreen() { try { if (document.fullscreenElement) await document.exitFullscreen(); else await $('cabinet').requestFullscreen(); } catch { $('status').textContent = 'Fullscreen is unavailable in this browser.'; } }
-$('play').onclick = play; $('pause').onclick = togglePause; $('restart').onclick = restart; $('fullscreen').onclick = fullscreen;
-$('sound').onclick = () => { settings.sound = !settings.sound; sound.unlock().catch(console.error); apply(); };
+$('splashPlay').onclick = play; $('play').onclick = play; $('pause').onclick = togglePause; $('restart').onclick = restart; $('fullscreen').onclick = fullscreen;
+$('splashSound').onclick = $('sound').onclick = () => { settings.audioPreference = true; settings.sound = !settings.sound; sound.unlock().catch(console.error); apply(); };
 $('smooth').onchange = () => { settings.smooth = $('smooth').checked; apply(); };
 $('volume').oninput = () => { settings.volume = Number($('volume').value); apply(); };
 const mappings = { ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right', ArrowUp: 'jump', KeyW: 'jump', Space: 'jump', ArrowDown: 'duck', KeyS: 'duck', ShiftLeft: 'speed', ShiftRight: 'speed' };
@@ -95,9 +100,10 @@ async function init() {
     game = new Game(state, { character: new Uint8Array(charset), audio: sound.attach });
     view = new Renderer($('scene'), game.pixels);
     apply(); refresh();
-    for (const id of ['play', 'pause', 'restart']) $(id).disabled = false;
+    for (const id of ['splashPlay', 'play', 'pause', 'restart']) $(id).disabled = false;
+    $('splashPlay').textContent = 'Let’s roll  →';
     window.bcQuest = { snapshot: () => game.snapshot(), pause, resume: play };
     requestAnimationFrame(frame);
-  } catch (error) { console.error(error); $('noticeText').textContent = `Could not load the game: ${error.message}`; $('status').textContent = 'Please reload to try again.'; }
+  } catch (error) { console.error(error); $('splash').hidden = true; $('notice').hidden = false; $('noticeText').textContent = `Could not load the game: ${error.message}`; $('status').textContent = 'Please reload to try again.'; }
 }
 apply(); init();

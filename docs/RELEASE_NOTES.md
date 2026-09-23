@@ -15,3 +15,15 @@ No added music. No itch.io publication. Owner playtesting is required before pub
 ## Publication
 
 Owner approved v0.2.1 after testing on 22 September 2026. Uploaded the tested ZIP to itch.io, selected it as the browser build, updated description/cover/screenshot, set visibility Public, and verified it loads muted. https://fabrulana.itch.io/bc-quest-for-tires
+
+## v0.2.2 � welcome screen and sound default
+
+Added a comic-cover splash screen with the original animated Thor sprite, Play and sound controls. Sound is enabled by default and starts on Play. Explicit new mute choices are remembered; the old automatic mute preference is migrated. No sound plays on page load.
+
+## v0.2.3 - cover splash and woodland pixel fix
+
+Replaced the first splash with a landscape illustration based on the original box cover. The girl calls HELP from the dinosaur's cave; Thor approaches from the opposite cliff. Sound remains enabled by default after Play.
+
+Fixed the woodland flash: a mid-scanline fine-scroll change could exhaust the eight-pixel background queue, producing undefined RGB values rendered black. Empty dots now use the background colour. No changes to original gameplay, collision code or timing. A 1,000-frame woodland regression and the existing audio, animation, re-entry and restart checks pass (11 tests).
+
+The regression bypasses obstacle collisions only in its isolated test run to reach the woodland. This bypass is not part of the game build.

@@ -3,9 +3,12 @@
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#f3eddf"><meta name="description" content="B.C.'s Quest for Tires, with its original C64 characters, animation and sound in a Three.js presentation."><title>B.C.'s Quest for Tires</title><link rel="icon" href="./favicon.svg"></head>
 <body>
 <main>
-  <header><div><span class="eyebrow">THE C64 COLLECTION · 003</span><h1>B.C.’s <span>Quest for Tires</span></h1></div><span class="badge">TEST BUILD</span></header>
+  <header><div><span class="eyebrow">THE C64 COLLECTION · 003</span><h1>B.C.’s <span>Quest for Tires</span></h1></div><span class="badge">C64 CLASSIC</span></header>
   <section id="cabinet" aria-label="B.C.'s Quest for Tires game">
-    <div class="screen-wrap"><div id="scene" role="img" aria-label="Original C64 game screen"></div><div id="notice"><span id="noticeText">Loading the original adventure…</span><button id="play" disabled>Let’s roll <span>→</span></button></div></div>
+    <div class="screen-wrap"><section id="splash" aria-label="Welcome to B.C.’s Quest for Tires">
+      <img class="splash-art" src="./art/cover-splash.png" alt="B.C.'s Quest for Tires: Thor rides toward a gap while the girl calls HELP from the dinosaur's cave on the far cliff.">
+      <div class="splash-bottom"><button id="splashPlay" disabled>Loading adventure…</button><button id="splashSound" aria-pressed="true">Sound on ♫</button><span class="splash-enter">OR PRESS ENTER</span></div>
+    </section><div id="scene" role="img" aria-label="Original C64 game screen"></div><div id="notice"><span id="noticeText">Loading the original adventure…</span><button id="play" disabled>Let’s roll <span>→</span></button></div></div>
     <div class="toolbar"><div class="buttons"><button id="pause" disabled>Pause</button><button id="restart" disabled>Restart</button><button id="sound" aria-pressed="true">Sound on</button></div><span id="status" role="status">Getting ready</span><button id="fullscreen">Full screen ↗</button></div>
     <div class="touch" aria-label="Touch controls"><button data-key="left" aria-label="Move left">←</button><button data-key="right" aria-label="Move right">→</button><button data-key="slower">Speed −</button><button data-key="faster">Speed +</button><button data-key="duck">Duck ↓</button><button data-key="jump">Jump ↑</button></div>
   </section>
